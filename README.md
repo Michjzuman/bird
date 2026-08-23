@@ -5,10 +5,10 @@
 ,\)\\*\*(###(/*/*//(/,     ||  \  ||  ||  ' ||  |
  ,''''%%%\##(%%%'''',      ||__/  ||  ||    ||__|
          *((*
-        *///\\*,            CODE FREELY  
+        *///\\*,            CODE FREELY
 ```
 
-Bird is going to be a tui based code editor that is going to let you fly over your codebase.
+Bird will be a tui based code editor that is going to let you fly over your codebase.
 
 ---
 

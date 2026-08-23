@@ -1,8 +1,6 @@
 #ifndef BIRD_H
 #define BIRD_H
 
-#define FPS 60
-
 #include "types.h"
 
 typedef struct {
