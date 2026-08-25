@@ -1,5 +1,6 @@
 #include <ncurses.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "scene.h"
 
@@ -12,31 +13,61 @@ struct {
     .dragging = false
 };
 
+void init_ncurses() {
+    initscr();
+    noecho();
+    curs_set(0);
+    cbreak();
+    keypad(stdscr, TRUE);
+    nodelay(stdscr, TRUE);
+    timeout(1000 / FPS);
+    mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
+    printf("\033[?1002h");
+    fflush(stdout);
+    /*
+    start_color();
+    init_color(10, 20, 50, 100);
+    init_pair(1, COLOR_WHITE, 10);
+    bkgd(COLOR_PAIR(1));
+    */
+}
+
+void draw_char(Scene *scene, View *view, U32 x, U32 y, char ch) {
+    mvaddch(y - view->camera.y, x - view->camera.x, ch);
+}
+
+void draw_content(Scene *scene, View *view, Panel *panel) {
+    switch (panel->type) {
+        case EDITOR_PANEL:
+            draw_editor_content(scene, view, panel);
+            break;
+        default:
+            break;
+    }
+}
+
 void draw_panels(Scene *scene, View *view) {
     for (U16 i = 0; i < scene->panel_count; i++) {
         Panel p = scene->panels[i];
         for (U8 right = 0; right < 2; right++) {
             for (U8 bottom = 0; bottom < 2; bottom++) {
-                mvaddch(
-                    p.y + p.h * bottom - view->camera.y,
-                    p.x + p.w * right - view->camera.x,
-                    '+'
+                draw_char(
+                    scene, view,
+                    p.x + p.w * right, p.y + p.h * bottom, '+'
                 );
                 if (bottom == 0) {
                     for (U8 y = 1; y < p.h; y++) {
-                        mvaddch(
-                            p.y + y - view->camera.y,
-                            p.x + p.w * right - view->camera.x,
-                            '|'
+                        draw_char(
+                            scene, view,
+                            p.x + p.w * right, p.y + y, '|'
                         );
                     }
                 }
                 if (right == 0) {
                     for (U8 x = 1; x < p.w; x++) {
-                        mvaddch(
-                            p.y + p.h * bottom - view->camera.y,
-                            p.x + x - view->camera.x,
-                            '-'
+                        draw_char(
+                            scene, view,
+                            p.x + x, p.y + p.h * bottom, '-'
                         );
                     }
                 }
@@ -47,6 +78,9 @@ void draw_panels(Scene *scene, View *view) {
 
 void draw_scene(Scene *scene, View *view) {
     draw_panels(scene, view);
+    for (U16 i = 0; i < scene->panel_count; i++) {
+        draw_content(scene, view, &scene->panels[i]);
+    }
 }
 
 void update(Scene *scene, View *view) {
@@ -85,27 +119,16 @@ void update(Scene *scene, View *view) {
 }
 
 int main() {
-    initscr();
-    noecho();
-    curs_set(0);
-    cbreak();
-    keypad(stdscr, TRUE);
-    nodelay(stdscr, TRUE);
-    timeout(1000 / FPS);
-
-    mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
-    printf("\033[?1002h");
-    fflush(stdout);
-
     View view;
     Scene scene;
 
     scene.panel_count = 3;
     scene.panels = malloc(scene.panel_count * sizeof(Panel));
     scene.panels[0] = (Panel){
-        .type = DUMMY_PANEL,
+        .type = EDITOR_PANEL,
         .x = 6, .y = 2,
-        .w = 40, .h = 30
+        .w = 40, .h = 30,
+        .data.editor = load_file("./include/types.h")
     };
     scene.panels[1] = (Panel){
         .type = DUMMY_PANEL,
@@ -120,15 +143,17 @@ int main() {
 
     view.camera = (Camera){0, 0, 0, 0};
 
+    init_ncurses();
     while (true) {
         clear();
         draw_scene(&scene, &view);
         update(&scene, &view);
         refresh();
     }
-
-    free(scene.panels);
     endwin();
+    
+    free(scene.panels);
+
     return 0;
 }
 

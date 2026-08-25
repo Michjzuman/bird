@@ -5,7 +5,7 @@
 ,\)\\*\*(###(/*/*//(/,     ||  \  ||  ||  ' ||  |
  ,''''%%%\##(%%%'''',      ||__/  ||  ||    ||__|
          *((*
-        *///\\*,            CODE FREELY
+        *//\\\*             CODE FREELY
 ```
 
 Bird will be a tui based code editor that is going to let you fly over your codebase.

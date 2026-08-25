@@ -2,6 +2,7 @@
 #define BIRD_H
 
 #include "types.h"
+#include "editor.h"
 
 typedef struct {
     double x, y;
@@ -19,11 +20,6 @@ enum PanelType {
     EDITOR_PANEL,
     TERMINAL_PANEL
 };
-
-typedef struct {
-    char *path;
-    char *content;
-} EditorData;
 
 typedef union {
     EditorData editor;
@@ -46,5 +42,9 @@ typedef struct {
     U8 sticky_panel_count;
     StickyPanel *sticky_panels;
 } Scene;
+
+void draw_editor_content(Scene *scene, View *view, Panel *panel);
+
+void draw_char(Scene *scene, View *view, U32 x, U32 y, char ch);
 
 #endif
