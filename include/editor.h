@@ -14,8 +14,4 @@ typedef struct {
     U32 capacity;
 } EditorData;
 
-EditorData load_file(char *path);
-
-void close_file(EditorData *data);
-
 #endif

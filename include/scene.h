@@ -44,6 +44,8 @@ typedef struct {
 } Scene;
 
 void draw_editor_content(Scene *scene, View *view, Panel *panel);
+void load_editor_file(Panel *panel, char *path);
+void close_editor_file(EditorData *data);
 
 void draw_char(Scene *scene, View *view, U32 x, U32 y, char ch);
 

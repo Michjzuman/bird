@@ -4,7 +4,7 @@
 
 #include "scene.h"
 
-EditorData load_file(char *path) {
+void load_editor_file(Panel *panel, char *path) {
     EditorData data;
     data.path = path;
 
@@ -14,6 +14,8 @@ EditorData load_file(char *path) {
     FILE *file = fopen(path, "r");
 
     if (file == NULL) exit(0);
+
+    U32 max_w = 0;
     
     char line[2048];
     U32 y = 0;
@@ -24,24 +26,28 @@ EditorData load_file(char *path) {
                 data.lines, data.capacity * sizeof(EditorLine)
             );
         }
-        data.lines[y].w = strlen(line) + 1;
-        data.lines[y].capacity = 1;
-        while (data.lines[y].capacity < data.lines[y].w) {
-            data.lines[y].capacity *= 2;
+        EditorLine *nline = &data.lines[y];
+        nline->w = strlen(line) + 1;
+        if (max_w < nline->w) max_w = nline->w;
+        nline->capacity = 1;
+        while (nline->capacity < nline->w) {
+            nline->capacity *= 2;
         }
-        data.lines[y].content = malloc(
-            data.lines[y].capacity * sizeof(char)
+        nline->content = malloc(
+            nline->capacity * sizeof(char)
         );
-        strcpy(data.lines[y].content, line);
+        strcpy(nline->content, line);
         y++;
     }
     data.h = y;
     
     fclose(file);
-    return data;
+    panel->data.editor = data;
+    panel->h = data.h + 1;
+    panel->w = max_w + 1;
 }
 
-void close_file(EditorData *data) {
+void close_editor_file(EditorData *data) {
     for (U8 y = 0; y < data->h; y++) {
         free(data->lines[y].content);
     }
@@ -52,11 +58,13 @@ void draw_editor_content(Scene *scene, View *view, Panel *panel) {
     EditorData data = panel->data.editor;
     for (U32 y = 0; y < data.h; y++) {
         for (U32 x = 0; x < data.lines[y].w - 1; x++) {
-            draw_char(
-                scene, view,
-                panel->x + x + 2, panel->y + y + 1,
-                data.lines[y].content[x]
-            );
+            if (data.lines[y].content[x] != '\n') {
+                draw_char(
+                    scene, view,
+                    panel->x + x + 2, panel->y + y + 1,
+                    data.lines[y].content[x]
+                );
+            }
         }
     }
 }

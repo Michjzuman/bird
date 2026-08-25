@@ -13,6 +13,8 @@ struct {
     .dragging = false
 };
 
+struct {U32 w, h;} terminal_size; 
+
 void init_ncurses() {
     initscr();
     noecho();
@@ -24,6 +26,7 @@ void init_ncurses() {
     mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
     printf("\033[?1002h");
     fflush(stdout);
+    getmaxyx(stdscr, terminal_size.h, terminal_size.w);
     /*
     start_color();
     init_color(10, 20, 50, 100);
@@ -33,7 +36,14 @@ void init_ncurses() {
 }
 
 void draw_char(Scene *scene, View *view, U32 x, U32 y, char ch) {
-    mvaddch(y - view->camera.y, x - view->camera.x, ch);
+    I64 ax = x - view->camera.x;
+    I64 ay = y - view->camera.y;
+    if (
+        ax >= 0 && ax < terminal_size.w &&
+        ay >= 0 && ay < terminal_size.h
+    ) {
+        mvaddch(ay, ax, ch);
+    }
 }
 
 void draw_content(Scene *scene, View *view, Panel *panel) {
@@ -77,20 +87,28 @@ void draw_panels(Scene *scene, View *view) {
 }
 
 void draw_scene(Scene *scene, View *view) {
+    clear();
     draw_panels(scene, view);
     for (U16 i = 0; i < scene->panel_count; i++) {
         draw_content(scene, view, &scene->panels[i]);
     }
+    mvprintw(0, 0, "%f", view->camera.speed_x);
+    mvprintw(1, 0, "%f", view->camera.speed_y);
+    refresh();
 }
 
 void update(Scene *scene, View *view) {
+    getmaxyx(stdscr, terminal_size.h, terminal_size.w);
+
+    Camera *camera = &view->camera;
+
     int key = getch();
     switch (key) {
         case 'q': endwin(); exit(0); break;
-        case KEY_UP: view->camera.speed_y--; break;
-        case KEY_RIGHT: view->camera.speed_x++; break;
-        case KEY_DOWN: view->camera.speed_y++; break;
-        case KEY_LEFT: view->camera.speed_x--; break;
+        case KEY_UP: camera->speed_y--; break;
+        case KEY_RIGHT: camera->speed_x++; break;
+        case KEY_DOWN: camera->speed_y++; break;
+        case KEY_LEFT: camera->speed_x--; break;
         case KEY_MOUSE: {
             MEVENT event;
             if (getmouse(&event) != OK) break;
@@ -103,8 +121,8 @@ void update(Scene *scene, View *view) {
                 mouse.dragging = false;
             }
             if (mouse.dragging) {
-                view->camera.x += mouse.x - event.x;
-                view->camera.y += mouse.y - event.y;
+                camera->x += mouse.x - event.x;
+                camera->y += mouse.y - event.y;
                 mouse.x = event.x;
                 mouse.y = event.y;
             }
@@ -112,43 +130,46 @@ void update(Scene *scene, View *view) {
         }
     }
 
-    view->camera.speed_x *= 0.9;
-    view->camera.speed_y *= 0.9;
-    view->camera.x += view->camera.speed_x;
-    view->camera.y += view->camera.speed_y / 2;
+    camera->speed_x *= 0.9;
+    camera->speed_y *= 0.9;
+    if (0.1 < (camera->speed_x > 0 ? camera->speed_x :-camera->speed_x)) {
+        camera->x += camera->speed_x;
+    }
+    if (0.1 < (camera->speed_y > 0 ? camera->speed_y :-camera->speed_y)) {
+        camera->y += camera->speed_y;
+    }
 }
 
 int main() {
     View view;
     Scene scene;
 
-    scene.panel_count = 3;
+    scene.panel_count = 2;
     scene.panels = malloc(scene.panel_count * sizeof(Panel));
     scene.panels[0] = (Panel){
         .type = EDITOR_PANEL,
-        .x = 6, .y = 2,
-        .w = 40, .h = 30,
-        .data.editor = load_file("./include/types.h")
+        .x = 6, .y = 2
     };
+    load_editor_file(&scene.panels[0], "./src/bird.c");
     scene.panels[1] = (Panel){
-        .type = DUMMY_PANEL,
-        .x = 50, .y = 2,
-        .w = 60, .h = 50
+        .type = EDITOR_PANEL,
+        .x = 9 + scene.panels[0].w, .y = 2
     };
+    load_editor_file(&scene.panels[1], "./src/editor.c");
+    /*
     scene.panels[2] = (Panel){
         .type = DUMMY_PANEL,
         .x = 114, .y = 2,
         .w = 50, .h = 20
     };
+    */
 
-    view.camera = (Camera){0, 0, 0, 0};
+    view.camera = (Camera){0, 0, 0.5, 0};
 
     init_ncurses();
     while (true) {
-        clear();
         draw_scene(&scene, &view);
         update(&scene, &view);
-        refresh();
     }
     endwin();
     
