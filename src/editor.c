@@ -1,8 +1,6 @@
-#include <ncurses.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "scene.h"
+
+#include <string.h>
 
 void load_editor_file(Panel *panel, char *path) {
     EditorData data;
@@ -52,20 +50,5 @@ void close_editor_file(EditorData *data) {
         free(data->lines[y].content);
     }
     free(data->lines);
-}
-
-void draw_editor_content(Scene *scene, View *view, Panel *panel) {
-    EditorData data = panel->data.editor;
-    for (U32 y = 0; y < data.h; y++) {
-        for (U32 x = 0; x < data.lines[y].w - 1; x++) {
-            if (data.lines[y].content[x] != '\n') {
-                draw_char(
-                    scene, view,
-                    panel->x + x + 2, panel->y + y + 1,
-                    data.lines[y].content[x]
-                );
-            }
-        }
-    }
 }
 
