@@ -10,14 +10,20 @@ void update(Scene *scene, View *view) {
 
     int key = getch();
     switch (key) {
-        case 'q': endwin(); exit(0); break;
-        case KEY_UP: camera->speed_y--; break;
-        case KEY_RIGHT: camera->speed_x++; break;
-        case KEY_DOWN: camera->speed_y++; break;
-        case KEY_LEFT: camera->speed_x--; break;
+        case 'q': {endwin(); exit(0);} break;
+        case 'w': case KEY_UP: camera->speed_y--; break;
+        case 'd': case KEY_RIGHT: camera->speed_x++; break;
+        case 's': case KEY_DOWN: camera->speed_y++; break;
+        case 'a': case KEY_LEFT: camera->speed_x--; break;
         case KEY_MOUSE: {
             MEVENT event;
             if (getmouse(&event) != OK) break;
+            if (event.bstate & BUTTON4_PRESSED) {
+                camera->speed_y--;
+            }
+            if (event.bstate & BUTTON5_PRESSED) {
+                camera->speed_y++;
+            }
             if (event.bstate & BUTTON1_PRESSED) {
                 mouse.dragging = true;
                 mouse.x = event.x;
@@ -38,10 +44,10 @@ void update(Scene *scene, View *view) {
 
     camera->speed_x *= 0.9;
     camera->speed_y *= 0.9;
-    if (0.1 < (camera->speed_x > 0 ? camera->speed_x :-camera->speed_x)) {
+    if (0.1 < (camera->speed_x > 0 ? camera->speed_x : -camera->speed_x)) {
         camera->x += camera->speed_x;
     }
-    if (0.1 < (camera->speed_y > 0 ? camera->speed_y :-camera->speed_y)) {
+    if (0.1 < (camera->speed_y > 0 ? camera->speed_y : -camera->speed_y)) {
         camera->y += camera->speed_y;
     }
 }

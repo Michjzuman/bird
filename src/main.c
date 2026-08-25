@@ -1,9 +1,8 @@
 #include "scene.h"
 #include "draw.h"
+#include "update.h"
 
 #define FPS 60
-
-void update(Scene *scene, View *view);
 
 struct Mouse mouse = {
     .dragging = false
@@ -41,19 +40,12 @@ int main() {
         .type = EDITOR_PANEL,
         .x = 6, .y = 2
     };
-    load_editor_file(&scene.panels[0], "./src/bird.c");
+    load_editor_file(&scene.panels[0], "./src/main.c");
     scene.panels[1] = (Panel){
         .type = EDITOR_PANEL,
         .x = 9 + scene.panels[0].w, .y = 2
     };
     load_editor_file(&scene.panels[1], "./src/editor.c");
-    /*
-    scene.panels[2] = (Panel){
-        .type = DUMMY_PANEL,
-        .x = 114, .y = 2,
-        .w = 50, .h = 20
-    };
-    */
 
     view.camera = (Camera){0, 0, 0, 0};
 

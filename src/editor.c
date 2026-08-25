@@ -11,7 +11,7 @@ void load_editor_file(Panel *panel, char *path) {
     
     FILE *file = fopen(path, "r");
 
-    if (file == NULL) exit(0);
+    if (file == NULL) exit(1);
 
     U32 max_w = 0;
     

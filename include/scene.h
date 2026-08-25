@@ -1,7 +1,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include <ncurses.h>
+#include <ncursesw/curses.h>
 
 #include "types.h"
 #include "view.h"

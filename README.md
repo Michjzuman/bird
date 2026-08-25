@@ -10,6 +10,8 @@
 
 Bird will be a tui based code editor that is going to let you fly over your codebase.
 
+[ NOTE: THIS PROJECT IS STILL IN DEVELOPMENT ]
+
 ---
 
 Compile:
