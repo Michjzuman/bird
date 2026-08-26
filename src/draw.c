@@ -3,8 +3,6 @@
 
 #include <string.h>
 
-Config config;
-
 void draw_char(Scene *scene, View *view, U32 x, U32 y, char ch) {
     I64 ax = x - (I64)view->camera.x;
     I64 ay = y - (I64)view->camera.y;
