@@ -1,12 +1,18 @@
 #include "scene.h"
 
-struct Size terminal_size;
-struct Mouse mouse;
-
 void update(Scene *scene, View *view) {
     view->changed = false;
 
-    getmaxyx(stdscr, terminal_size.h, terminal_size.w);
+    {
+        struct Size old = view->terminal_size;
+        getmaxyx(stdscr, view->terminal_size.h, view->terminal_size.w);
+        if (
+            old.w != view->terminal_size.w ||
+            old.h != view->terminal_size.h
+        ) {
+            view->changed = true;
+        }
+    }
 
     Camera *camera = &view->camera;
 
@@ -21,24 +27,26 @@ void update(Scene *scene, View *view) {
             MEVENT event;
             if (getmouse(&event) != OK) break;
             if (event.bstate & BUTTON4_PRESSED) {
-                camera->speed_y--;
+                camera->y--;
+                view->changed = true;
             }
             if (event.bstate & BUTTON5_PRESSED) {
-                camera->speed_y++;
+                camera->y++;
+                view->changed = true;
             }
             if (event.bstate & BUTTON1_PRESSED) {
-                mouse.dragging = true;
-                mouse.x = event.x;
-                mouse.y = event.y;
+                view->mouse.dragging = true;
+                view->mouse.x = event.x;
+                view->mouse.y = event.y;
             }
             if (event.bstate & BUTTON1_RELEASED) {
-                mouse.dragging = false;
+                view->mouse.dragging = false;
             }
-            if (mouse.dragging) {
-                camera->x += mouse.x - event.x;
-                camera->y += mouse.y - event.y;
-                mouse.x = event.x;
-                mouse.y = event.y;
+            if (view->mouse.dragging) {
+                camera->x += view->mouse.x - event.x;
+                camera->y += view->mouse.y - event.y;
+                view->mouse.x = event.x;
+                view->mouse.y = event.y;
             }
             break;
         }

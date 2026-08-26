@@ -1,16 +1,17 @@
 #include "scene.h"
 #include "draw.h"
 #include "tick.h"
+#include "config.h"
 
 #define FPS 60
 
-struct Mouse mouse = {
-    .dragging = false
-};
+Config config;
 
-struct Size terminal_size;
+void init_config() {
+    config.fill_void = false;
+}
 
-void init_ncurses() {
+void init_ncurses(View *view) {
     initscr();
     noecho();
     curs_set(0);
@@ -21,7 +22,7 @@ void init_ncurses() {
     mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
     printf("\033[?1002h");
     fflush(stdout);
-    getmaxyx(stdscr, terminal_size.h, terminal_size.w);
+    getmaxyx(stdscr, view->terminal_size.h, view->terminal_size.w);
     /*
     start_color();
     init_color(10, 20, 50, 100);
@@ -31,6 +32,8 @@ void init_ncurses() {
 }
 
 int main() {
+    init_config();
+
     View view;
     Scene scene;
 
@@ -40,16 +43,17 @@ int main() {
         .type = EDITOR_PANEL,
         .x = 6, .y = 2
     };
-    load_editor_file(&scene.panels[0], "./src/main.c");
+    load_editor_file(&scene.panels[0], "src/main.c");
     scene.panels[1] = (Panel){
         .type = EDITOR_PANEL,
         .x = 9 + scene.panels[0].w, .y = 2
     };
-    load_editor_file(&scene.panels[1], "./src/editor.c");
+    load_editor_file(&scene.panels[1], "src/editor.c");
 
     view.camera = (Camera){0, 0, 0, 0};
+    view.mouse.dragging = false;
 
-    init_ncurses();
+    init_ncurses(&view);
     while (true) {
         draw_scene(&scene, &view);
         update(&scene, &view);

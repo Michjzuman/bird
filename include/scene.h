@@ -14,13 +14,4 @@ typedef struct {
     StickyPanel *sticky_panels;
 } Scene;
 
-extern struct Size {
-    U32 w, h;
-} terminal_size;
-
-extern struct Mouse {
-    bool dragging;
-    int x, y;
-} mouse;
-
 #endif

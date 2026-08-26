@@ -4,8 +4,17 @@
 #include "types.h"
 
 typedef struct {
-    U8 theme;
-    
+    char *top_right;
+    char *top_left;
+    char *bottom_right;
+    char *bottom_left;
+    char *horizontal;
+    char *vertical;
+} Theme;
+
+typedef struct {
+    Theme theme;
+    bool fill_void;
 } Config;
 
 extern Config config;

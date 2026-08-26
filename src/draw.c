@@ -1,13 +1,16 @@
 #include "scene.h"
+#include "config.h"
 
-struct Size terminal_size;
+#include <string.h>
+
+Config config;
 
 void draw_char(Scene *scene, View *view, U32 x, U32 y, char ch) {
     I64 ax = x - (I64)view->camera.x;
     I64 ay = y - (I64)view->camera.y;
     if (
-        ax >= 0 && ax < terminal_size.w &&
-        ay >= 0 && ay < terminal_size.h
+        ax >= 0 && ax < view->terminal_size.w &&
+        ay >= 0 && ay < view->terminal_size.h
     ) {
         mvaddch(ay, ax, ch);
     }
@@ -45,6 +48,12 @@ void draw_panels(Scene *scene, View *view) {
 
 void draw_editor_content(Scene *scene, View *view, Panel *panel) {
     EditorData data = panel->data.editor;
+    for (U32 x = 0; x < strlen(data.path); x++) {
+        draw_char(
+            scene, view,
+            panel->x + x + 2, panel->y - 1, data.path[x]
+        );
+    }
     for (U32 y = 0; y < data.h; y++) {
         for (U32 x = 0; x < data.lines[y].w - 1; x++) {
             if (data.lines[y].content[x] != '\n') {
@@ -52,6 +61,15 @@ void draw_editor_content(Scene *scene, View *view, Panel *panel) {
                     scene, view,
                     panel->x + x + 2, panel->y + y + 1,
                     data.lines[y].content[x]
+                );
+            }
+        }
+        if (config.fill_void) {
+            for (U32 x = data.lines[y].w - 2; x < panel->w - 3; x++) {
+                draw_char(
+                    scene, view,
+                    panel->x + x + 2, panel->y + y + 1,
+                    ':'
                 );
             }
         }
