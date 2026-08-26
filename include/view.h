@@ -13,21 +13,21 @@ typedef struct {
     U32 x, y;
 } Cursor;
 
-struct Size {
+typedef struct {
     U32 w, h;
-};
+} TerminalSize;
 
-struct Mouse {
+typedef struct {
     bool dragging;
     int x, y;
-};
+} Mouse;
 
 typedef struct {
     Camera camera;
     Cursor cursor;
     bool changed;
-    struct Mouse mouse;
-    struct Size terminal_size;
+    Mouse mouse;
+    TerminalSize terminal_size;
 } View;
 
 #endif

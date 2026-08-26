@@ -1,2 +1,2 @@
 bird: src/*.c
-	clang src/*.c -I include -l ncurses -o bird
+	clang src/*.c -I include -l ncurses -o bird -g -O0

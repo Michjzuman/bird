@@ -4,7 +4,7 @@ void update(Scene *scene, View *view) {
     view->changed = false;
 
     {
-        struct Size old = view->terminal_size;
+        TerminalSize old = view->terminal_size;
         getmaxyx(stdscr, view->terminal_size.h, view->terminal_size.w);
         if (
             old.w != view->terminal_size.w ||
@@ -45,8 +45,12 @@ void update(Scene *scene, View *view) {
                 view->mouse.dragging = false;
             }
             if (view->mouse.dragging) {
+                Camera old_camera = view->camera;
                 camera->x += view->mouse.x - event.x;
                 camera->y += view->mouse.y - event.y;
+                if (old_camera.x != camera->x || old_camera.y != camera->y) {
+                    view->changed = true;
+                }
                 view->mouse.x = event.x;
                 view->mouse.y = event.y;
             }

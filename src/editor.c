@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-void load_editor_file(Panel *panel, char *path) {
+void load_editor_file(PanelRow *panel_row, Panel *panel, char *path) {
     EditorData data;
     data.path = path;
 
@@ -42,7 +42,7 @@ void load_editor_file(Panel *panel, char *path) {
     fclose(file);
     panel->data.editor = data;
     panel->h = data.h + 1;
-    panel->w = max_w + 1;
+    panel_row->w = max_w + 1;
 }
 
 void close_editor_file(EditorData *data) {

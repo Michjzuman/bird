@@ -2,6 +2,7 @@
 #include "draw.h"
 #include "tick.h"
 #include "config.h"
+#include "panel_manager.h"
 
 #define FPS 60
 
@@ -36,18 +37,7 @@ int main() {
     View view;
     Scene scene;
 
-    scene.panel_count = 2;
-    scene.panels = malloc(scene.panel_count * sizeof(Panel));
-    scene.panels[0] = (Panel){
-        .type = EDITOR_PANEL,
-        .x = 6, .y = 2
-    };
-    load_editor_file(&scene.panels[0], "src/main.c");
-    scene.panels[1] = (Panel){
-        .type = EDITOR_PANEL,
-        .x = 9 + scene.panels[0].w, .y = 2
-    };
-    load_editor_file(&scene.panels[1], "src/editor.c");
+    init_scene(&scene, &view);
 
     view.camera = (Camera){0, 0, 0, 0};
     view.mouse.dragging = false;
@@ -60,7 +50,7 @@ int main() {
     }
     endwin();
     
-    free(scene.panels);
+    close_scene(&scene);
 
     return 0;
 }

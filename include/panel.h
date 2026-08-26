@@ -27,17 +27,23 @@ typedef union {
 } PanelData;
 
 typedef struct {
-    U32 x, y, w, h;
     U8 type;
+    U32 y, h;
     PanelData data;
 } Panel;
+
+typedef struct {
+    U32 x, w;
+    U16 panel_count;
+    Panel *panels;
+} PanelRow;
 
 typedef struct {
     U32 x, y, w, h;
     U8 side;
 } StickyPanel;
 
-void load_editor_file(Panel *panel, char *path);
+void load_editor_file(PanelRow *panel_row, Panel *panel, char *path);
 void close_editor_file(EditorData *data);
 
 #endif
