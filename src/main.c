@@ -11,7 +11,7 @@ void init_config() {
     config.fill_void = false;
 }
 
-void init_ncurses(View *view) {
+void init_ncurses() {
     initscr();
     noecho();
     curs_set(0);
@@ -22,7 +22,6 @@ void init_ncurses(View *view) {
     mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
     printf("\033[?1002h");
     fflush(stdout);
-    getmaxyx(stdscr, view->terminal_size.h, view->terminal_size.w);
     /*
     start_color();
     init_color(10, 20, 50, 100);
@@ -53,7 +52,8 @@ int main() {
     view.camera = (Camera){0, 0, 0, 0};
     view.mouse.dragging = false;
 
-    init_ncurses(&view);
+    init_ncurses();
+    update(&scene, &view);
     while (true) {
         draw_scene(&scene, &view);
         update(&scene, &view);

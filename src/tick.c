@@ -30,10 +30,12 @@ void update(Scene *scene, View *view) {
                 camera->y--;
                 view->changed = true;
             }
+            /*
             if (event.bstate & BUTTON5_PRESSED) {
                 camera->y++;
                 view->changed = true;
             }
+            */
             if (event.bstate & BUTTON1_PRESSED) {
                 view->mouse.dragging = true;
                 view->mouse.x = event.x;
