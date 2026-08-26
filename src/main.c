@@ -1,6 +1,6 @@
 #include "scene.h"
 #include "draw.h"
-#include "update.h"
+#include "tick.h"
 
 #define FPS 60
 

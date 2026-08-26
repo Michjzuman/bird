@@ -8,7 +8,7 @@
         *//\\\*             CODE FREELY
 ```
 
-Bird will be a tui based code editor that is going to let you fly over your codebase.
+Bird will be a tui based code editor that will let you fly over your codebase.
 
 [ NOTE: THIS PROJECT IS STILL IN DEVELOPMENT ]
 

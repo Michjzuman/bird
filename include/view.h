@@ -9,9 +9,14 @@ typedef struct {
 } Camera;
 
 typedef struct {
-    Camera camera;
-    U16 cursor_panel;
+    U16 panel;
     U32 x, y;
+} Cursor;
+
+typedef struct {
+    Camera camera;
+    Cursor cursor;
+    bool changed;
 } View;
 
 #endif

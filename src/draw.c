@@ -69,10 +69,12 @@ void draw_content(Scene *scene, View *view, Panel *panel) {
 }
 
 void draw_scene(Scene *scene, View *view) {
-    clear();
-    draw_panels(scene, view);
-    for (U16 i = 0; i < scene->panel_count; i++) {
-        draw_content(scene, view, &scene->panels[i]);
+    if (view->changed) {
+        clear();
+        draw_panels(scene, view);
+        for (U16 i = 0; i < scene->panel_count; i++) {
+            draw_content(scene, view, &scene->panels[i]);
+        }
+        refresh();
     }
-    refresh();
 }

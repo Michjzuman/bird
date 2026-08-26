@@ -4,6 +4,8 @@ struct Size terminal_size;
 struct Mouse mouse;
 
 void update(Scene *scene, View *view) {
+    view->changed = false;
+
     getmaxyx(stdscr, terminal_size.h, terminal_size.w);
 
     Camera *camera = &view->camera;
@@ -46,8 +48,10 @@ void update(Scene *scene, View *view) {
     camera->speed_y *= 0.9;
     if (0.1 < (camera->speed_x > 0 ? camera->speed_x : -camera->speed_x)) {
         camera->x += camera->speed_x;
+        view->changed = true;
     }
     if (0.1 < (camera->speed_y > 0 ? camera->speed_y : -camera->speed_y)) {
         camera->y += camera->speed_y;
+        view->changed = true;
     }
 }
