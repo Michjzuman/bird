@@ -15,8 +15,11 @@ typedef struct {
 typedef struct {
     Theme theme;
     bool fill_void;
+    U8 margin_x, margin_y;
 } Config;
 
 extern Config config;
+
+void init_config(void);
 
 #endif

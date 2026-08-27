@@ -3,8 +3,12 @@
 
 #include "scene.h"
 
-void init_scene(Scene *scene, View *view);
+void init_scene(Scene *);
 
-void close_scene(Scene *scene);
+void close_scene(Scene *);
+
+PanelRow *add_panel_row(Scene *);
+
+Panel *add_panel(PanelRow *);
 
 #endif

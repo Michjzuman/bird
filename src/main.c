@@ -4,32 +4,7 @@
 #include "config.h"
 #include "panel_manager.h"
 
-#define FPS 60
-
-Config config;
-
-void init_config() {
-    config.fill_void = false;
-}
-
-void init_ncurses() {
-    initscr();
-    noecho();
-    curs_set(0);
-    cbreak();
-    keypad(stdscr, TRUE);
-    nodelay(stdscr, TRUE);
-    timeout(1000 / FPS);
-    mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
-    printf("\033[?1002h");
-    fflush(stdout);
-    /*
-    start_color();
-    init_color(10, 20, 50, 100);
-    init_pair(1, COLOR_WHITE, 10);
-    bkgd(COLOR_PAIR(1));
-    */
-}
+void init_ncurses(void);
 
 int main() {
     init_config();
@@ -37,7 +12,37 @@ int main() {
     View view;
     Scene scene;
 
-    init_scene(&scene, &view);
+    init_scene(&scene);
+
+    {
+        PanelRow *row = add_panel_row(&scene);
+        {
+            Panel *panel = add_panel(row);
+            load_editor_file(row, panel, "include/types.h");
+        }
+        {
+            Panel *panel = add_panel(row);
+            load_editor_file(row, panel, "include/scene.h");
+        }
+    }
+    {
+        PanelRow *row = add_panel_row(&scene);
+        {
+            Panel *panel = add_panel(row);
+            load_editor_file(row, panel, "src/main.c");
+        }
+    }
+    {
+        PanelRow *row = add_panel_row(&scene);
+        {
+            Panel *panel = add_panel(row);
+            load_editor_file(row, panel, "include/types.h");
+        }
+        {
+            Panel *panel = add_panel(row);
+            load_editor_file(row, panel, "include/scene.h");
+        }
+    }
 
     view.camera = (Camera){0, 0, 0, 0};
     view.mouse.dragging = false;
