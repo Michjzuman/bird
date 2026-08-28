@@ -1,10 +1,6 @@
 #include "scene.h"
 #include "config.h"
 
-void init_panel(PanelRow *row, Panel *panel) {
-    load_editor_file(row, panel, "src/draw.c");
-}
-
 void init_panel_row(PanelRow *row) {
     row->panel_count = 0;
     row->panels = malloc(0);

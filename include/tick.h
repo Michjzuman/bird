@@ -3,6 +3,6 @@
 
 #include "scene.h"
 
-void update(Scene *scene, View *view);
+void tick(Scene *scene, View *view);
 
 #endif

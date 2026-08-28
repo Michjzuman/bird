@@ -16,6 +16,7 @@ typedef struct {
     Theme theme;
     bool fill_void;
     U8 margin_x, margin_y;
+    bool show_camera_coors;
 } Config;
 
 extern Config config;

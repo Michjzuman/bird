@@ -9,8 +9,8 @@ typedef struct {
 } Camera;
 
 typedef struct {
-    U16 panel;
-    U32 x, y;
+    U16 panel_row, panel;
+    U32 x, vx, y;
 } Cursor;
 
 typedef struct {
@@ -23,11 +23,12 @@ typedef struct {
 } Mouse;
 
 typedef struct {
+    bool changed;
     Camera camera;
     Cursor cursor;
-    bool changed;
     Mouse mouse;
     TerminalSize terminal_size;
+    bool locked_in;
 } View;
 
 #endif

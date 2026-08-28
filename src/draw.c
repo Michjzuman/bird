@@ -4,13 +4,30 @@
 #include <string.h>
 
 void draw_char(Scene *scene, View *view, U32 x, U32 y, char ch) {
-    I64 ax = x - (I64)view->camera.x;
-    I64 ay = y - (I64)view->camera.y;
+    I64 cam_x = view->camera.x;
+    I64 cam_y = view->camera.y;
+
+    Cursor *c = &view->cursor;
+    PanelRow *row = &scene->panel_rows[c->panel_row];
+    Panel *panel = &row->panels[c->panel];
+    U32 cx = row->x + c->vx + 2 - cam_x;
+    U32 cy = panel->y + c->y + 1 - cam_y;
+    
+    I64 ax = x - cam_x;
+    I64 ay = y - cam_y;
+
+    bool is_cursor = ax == cx && ay == cy && view->locked_in;
     if (
         ax >= 0 && ax < view->terminal_size.w &&
         ay >= 0 && ay < view->terminal_size.h
     ) {
-        mvaddch(ay, ax, ch);
+        if (is_cursor) {
+            //attron(COLOR_PAIR(1));
+            mvaddch(ay, ax, ch | A_REVERSE);
+            //attroff(COLOR_PAIR(1));
+        } else {
+            mvaddch(ay, ax, ch);
+        }
     }
 }
 
@@ -41,15 +58,12 @@ void draw_panel(Scene *scene, View *view, PanelRow *pr, Panel *p) {
     }
 }
 
-void draw_panels(Scene *scene, View *view, PanelRow *panel_row) {
-    for (U16 i = 0; i < panel_row->panel_count; i++) {
-        draw_panel(scene, view, panel_row, &panel_row->panels[i]);
-    }
-}
-
 void draw_panel_rows(Scene *scene, View *view) {
-    for (U16 i = 0; i < scene->panel_row_count; i++) {
-        draw_panels(scene, view, &scene->panel_rows[i]);
+    for (U16 x = 0; x < scene->panel_row_count; x++) {
+        PanelRow *row = &scene->panel_rows[x];
+        for (U16 y = 0; y < row->panel_count; y++) {
+            draw_panel(scene, view, row, &row->panels[y]);
+        }
     }
 }
 
@@ -63,21 +77,16 @@ void draw_editor_content(Scene *scene, View *view, PanelRow *pr, Panel *p) {
     }
     for (U32 y = 0; y < data.h; y++) {
         for (U32 x = 0; x < data.lines[y].w - 1; x++) {
-            if (data.lines[y].content[x] != '\n') {
-                draw_char(
-                    scene, view,
-                    pr->x + x + 2, p->y + y + 1,
-                    data.lines[y].content[x]
-                );
-            }
+            char ch = data.lines[y].content[x];
+            draw_char(
+                scene, view,
+                pr->x + x + 2, p->y + y + 1,
+                ch == '\n' ? ' ' : ch
+            );
         }
         if (config.fill_void) {
             for (U32 x = data.lines[y].w - 2; x < pr->w - 3; x++) {
-                draw_char(
-                    scene, view,
-                    pr->x + x + 2, p->y + y + 1,
-                    ':'
-                );
+                draw_char(scene, view, pr->x + x + 2, p->y + y + 1, ':');
             }
         }
     }
@@ -93,6 +102,18 @@ void draw_content(Scene *scene, View *view, PanelRow *pr, Panel *p) {
     }
 }
 
+void draw_easteregg(Scene *scene, View *view) {
+    draw_char(scene, view, 670, 670, '6');
+    draw_char(scene, view, 671, 670, '7');
+}
+
+void draw_camera_coors(View *view) {
+    if (config.show_camera_coors) {
+        mvprintw(0, 0, "x: %f", view->camera.x);
+        mvprintw(1, 0, "y: %f", view->camera.y);
+    }
+}
+
 void draw_scene(Scene *scene, View *view) {
     if (view->changed) {
         clear();
@@ -103,6 +124,12 @@ void draw_scene(Scene *scene, View *view) {
                 draw_content(scene, view, pr, &pr->panels[y]);
             }
         }
+        draw_easteregg(scene, view);
+        draw_camera_coors(view);
+        /*
+        mvprintw(0, 0, "x: %d", view->cursor.x);
+        mvprintw(1, 0, "y: %d", view->cursor.y);
+        */
         refresh();
     }
 }

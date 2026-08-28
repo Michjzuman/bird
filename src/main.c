@@ -3,6 +3,7 @@
 #include "tick.h"
 #include "config.h"
 #include "panel_manager.h"
+#include "editor.h"
 
 void init_ncurses(void);
 
@@ -16,42 +17,19 @@ int main() {
 
     {
         PanelRow *row = add_panel_row(&scene);
-        {
-            Panel *panel = add_panel(row);
-            load_editor_file(row, panel, "include/types.h");
-        }
-        {
-            Panel *panel = add_panel(row);
-            load_editor_file(row, panel, "include/scene.h");
-        }
-    }
-    {
-        PanelRow *row = add_panel_row(&scene);
-        {
-            Panel *panel = add_panel(row);
-            load_editor_file(row, panel, "src/main.c");
-        }
-    }
-    {
-        PanelRow *row = add_panel_row(&scene);
-        {
-            Panel *panel = add_panel(row);
-            load_editor_file(row, panel, "include/types.h");
-        }
-        {
-            Panel *panel = add_panel(row);
-            load_editor_file(row, panel, "include/scene.h");
-        }
+        Panel *panel = add_panel(row);
+        load_editor_file(row, panel, "test.txt");
     }
 
     view.camera = (Camera){0, 0, 0, 0};
     view.mouse.dragging = false;
+    view.cursor = (Cursor){0, 0, 0, 0, 0};
+    view.locked_in = true;
 
     init_ncurses();
-    update(&scene, &view);
     while (true) {
+        tick(&scene, &view);
         draw_scene(&scene, &view);
-        update(&scene, &view);
     }
     endwin();
     
@@ -59,5 +37,3 @@ int main() {
 
     return 0;
 }
-
-

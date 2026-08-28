@@ -2,6 +2,65 @@
 
 #include <string.h>
 
+void update_editor_content(Scene *scene, View *view, int key) {
+    Cursor *c = &view->cursor;
+    PanelRow *row = &scene->panel_rows[c->panel_row];
+    Panel *panel = &row->panels[c->panel];
+    EditorData *content = &panel->data.editor;
+    bool changed = true;
+    switch (key) {
+        case KEY_UP: {
+            if (c->y > 0) {
+                c->y--;
+                U32 w = content->lines[c->y].w - 2;
+                if (c->vx > w) c->vx = w;
+            }
+            break;
+        }
+        case KEY_RIGHT: {
+            c->x = c->vx + 1;
+            break;
+        }
+        case KEY_DOWN: {
+            if (c->y < panel->h - 2) {
+                c->y++;
+                U32 w = content->lines[c->y].w - 2;
+                if (c->vx > w) c->vx = w;
+            }
+            break;
+        }
+        case KEY_LEFT: {
+            if (c->x > 0) {
+                c->x = c->vx - 1;
+            }
+            break;
+        }
+        default: {
+            if (key >= 32 && key <= 126) {
+                EditorLine *line = &content->lines[c->y];
+                line->w++;
+                if (line->capacity < line->w) {
+                    line->capacity *= 2;
+                    line->content = realloc(line->content, line->capacity * sizeof(char));
+                }
+                for (I64 i = line->w - 1; i >= c->vx; i--) {
+                    line->content[i] = line->content[i - 1];
+                }
+                line->content[c->vx] = (char)key;
+                c->x++; c->vx++;
+                if (line->w + 1 > row->w) row->w = line->w + 1;
+            } else {
+                changed = false;
+            }
+            break;
+        }
+    }
+    U32 w = content->lines[c->y].w - 2;
+    c->vx = c->x;
+    if (c->vx > w) c->vx = w;
+    if (changed) view->changed = true;
+}
+
 void load_editor_file(PanelRow *panel_row, Panel *panel, char *path) {
     EditorData data;
     data.path = path;
@@ -53,4 +112,3 @@ void close_editor_file(EditorData *data) {
     }
     free(data->lines);
 }
-

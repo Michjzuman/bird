@@ -43,7 +43,4 @@ typedef struct {
     U8 side;
 } StickyPanel;
 
-void load_editor_file(PanelRow *panel_row, Panel *panel, char *path);
-void close_editor_file(EditorData *data);
-
 #endif

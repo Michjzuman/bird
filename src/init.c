@@ -18,5 +18,6 @@ void init_ncurses() {
     init_color(10, 20, 50, 100);
     init_pair(1, COLOR_WHITE, 10);
     bkgd(COLOR_PAIR(1));
+    init_pair(1, COLOR_BLACK, COLOR_WHITE);
     */
 }
