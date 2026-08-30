@@ -7,4 +7,5 @@ void init_config() {
     config.margin_x = 4;
     config.margin_y = 3;
     config.show_camera_coors = false;
+    config.newline_dot = false;
 }

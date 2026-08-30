@@ -17,6 +17,7 @@ typedef struct {
     bool fill_void;
     U8 margin_x, margin_y;
     bool show_camera_coors;
+    bool newline_dot;
 } Config;
 
 extern Config config;

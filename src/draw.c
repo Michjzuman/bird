@@ -39,7 +39,7 @@ void draw_panel(Scene *scene, View *view, PanelRow *pr, Panel *p) {
                 pr->x + pr->w * right, p->y + p->h * bottom, '+'
             );
             if (bottom == 0) {
-                for (U8 y = 1; y < p->h; y++) {
+                for (U32 y = 1; y < p->h; y++) {
                     draw_char(
                         scene, view,
                         pr->x + pr->w * right, p->y + y, '|'
@@ -47,7 +47,7 @@ void draw_panel(Scene *scene, View *view, PanelRow *pr, Panel *p) {
                 }
             }
             if (right == 0) {
-                for (U8 x = 1; x < pr->w; x++) {
+                for (U32 x = 1; x < pr->w; x++) {
                     draw_char(
                         scene, view,
                         pr->x + x, p->y + p->h * bottom, '-'
@@ -81,7 +81,7 @@ void draw_editor_content(Scene *scene, View *view, PanelRow *pr, Panel *p) {
             draw_char(
                 scene, view,
                 pr->x + x + 2, p->y + y + 1,
-                ch == '\n' ? ' ' : ch
+                ch == '\n' ? (config.newline_dot ? '.' : ' ') : ch
             );
         }
         if (config.fill_void) {
