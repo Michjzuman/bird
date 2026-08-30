@@ -76,7 +76,7 @@ void draw_editor_content(Scene *scene, View *view, PanelRow *pr, Panel *p) {
         );
     }
     for (U32 y = 0; y < data.h; y++) {
-        for (U32 x = 0; x < data.lines[y].w - 1; x++) {
+        for (U32 x = 0; x < data.lines[y].w; x++) {
             char ch = data.lines[y].content[x];
             draw_char(
                 scene, view,
@@ -85,7 +85,7 @@ void draw_editor_content(Scene *scene, View *view, PanelRow *pr, Panel *p) {
             );
         }
         if (config.fill_void) {
-            for (U32 x = data.lines[y].w - 2; x < pr->w - 3; x++) {
+            for (U32 x = data.lines[y].w; x < pr->w - 3; x++) {
                 draw_char(scene, view, pr->x + x + 2, p->y + y + 1, ':');
             }
         }

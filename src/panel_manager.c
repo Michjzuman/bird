@@ -1,14 +1,9 @@
 #include "scene.h"
 #include "config.h"
 
-void init_panel_row(PanelRow *row) {
+static void init_panel_row(PanelRow *row) {
     row->panel_count = 0;
     row->panels = malloc(0);
-}
-
-void init_scene(Scene *scene) {
-    scene->panel_row_count = 0;
-    scene->panel_rows = malloc(0);
 }
 
 void close_scene(Scene *scene) {

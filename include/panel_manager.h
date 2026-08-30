@@ -3,8 +3,6 @@
 
 #include "scene.h"
 
-void init_scene(Scene *);
-
 void close_scene(Scene *);
 
 PanelRow *add_panel_row(Scene *);

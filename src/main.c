@@ -4,8 +4,7 @@
 #include "config.h"
 #include "panel_manager.h"
 #include "editor.h"
-
-void init_ncurses(void);
+#include "init.h"
 
 int main() {
     init_config();
@@ -17,14 +16,26 @@ int main() {
 
     {
         PanelRow *row = add_panel_row(&scene);
-        Panel *panel = add_panel(row);
-        load_editor_file(row, panel, "test.txt");
+        {
+            Panel *panel = add_panel(row);
+            load_editor_file(row, panel, "test.txt");
+        }
+        /*
+        {
+            Panel *panel = add_panel(row);
+            load_editor_file(row, panel, "include/panel.h");
+        }
+        */
     }
-
-    view.camera = (Camera){0, 0, 0, 0};
-    view.mouse.dragging = false;
-    view.cursor = (Cursor){0, 0, 0, 0, 0};
-    view.locked_in = true;
+    /*
+    {
+        PanelRow *row = add_panel_row(&scene);
+        Panel *panel = add_panel(row);
+        load_editor_file(row, panel, "src/main.c");
+    }
+    */
+   
+    init_view(&view);
 
     init_ncurses();
     while (true) {
