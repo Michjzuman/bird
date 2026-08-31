@@ -17,12 +17,14 @@ void adjust_line_capacity(EditorLine *line) {
     }
 }
 
-void update_editor_panel_size(PanelRow *row, Panel *panel) {
-    EditorData *content= &panel->data.editor;
+void update_editor_panel_size(PanelRow *row) {
     U32 max_w = 0;
-    for (U32 y = 0; y < content->h; y++) {
-        EditorLine *line = &content->lines[y];
-        if (line->w > max_w) max_w = line->w;
+    for (U32 i = 0; i < row->panel_count; i++) {
+        EditorData *content= &row->panels[i].data.editor;
+        for (U32 y = 0; y < content->h; y++) {
+            EditorLine *line = &content->lines[y];
+            if (line->w > max_w) max_w = line->w;
+        }
     }
     row->w = max_w + 2;
 }
@@ -85,16 +87,18 @@ void update_editor_content(Scene *scene, View *view, int key) {
     EditorData *content = &panel->data.editor;
     EditorLine *line = &content->lines[c->y];
     bool changed = true;
+    /*
     for (U32 i = 0; i < content->h; i++) {
         mvprintw(20 + i, 0, "%d", content->lines[i].w);
         mvprintw(20 + i, 4, "%d", content->lines[i].capacity);
         mvprintw(20 + i, 8, "%p", content->lines[i].content);
     }
+    */
     switch (key) {
         case KEY_ENTER: case '\n': {
             add_editor_line(panel, c->y);
             wrap_editor_line(panel, c->y, c->vx, c->y + 1, true);
-            update_editor_panel_size(row, panel);
+            update_editor_panel_size(row);
             c->y++; c->x = 0;
             break;
         }
@@ -127,7 +131,7 @@ void update_editor_content(Scene *scene, View *view, int key) {
                 }
                 line->w--;
                 adjust_line_capacity(line);
-                update_editor_panel_size(row, panel);
+                update_editor_panel_size(row);
                 // fall through
             } else if (c->y > 0) {
                 U32 cx = content->lines[c->y - 1].w - 1;

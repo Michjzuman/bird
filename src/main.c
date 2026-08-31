@@ -20,21 +20,17 @@ int main() {
             Panel *panel = add_panel(row);
             load_editor_file(row, panel, "test.txt");
         }
-        /*
         {
             Panel *panel = add_panel(row);
             load_editor_file(row, panel, "include/panel.h");
         }
-        */
     }
-    /*
     {
         PanelRow *row = add_panel_row(&scene);
         Panel *panel = add_panel(row);
         load_editor_file(row, panel, "src/main.c");
     }
-    */
-   
+
     init_view(&view);
 
     init_ncurses();

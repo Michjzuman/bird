@@ -9,4 +9,8 @@ PanelRow *add_panel_row(Scene *);
 
 Panel *add_panel(PanelRow *);
 
+U32 get_row_x(Scene *, PanelRow *);
+
+U32 get_panel_y(PanelRow *, Panel *);
+
 #endif

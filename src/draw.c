@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "config.h"
+#include "panel_manager.h"
 
 #include <string.h>
 
@@ -10,8 +11,10 @@ void draw_char(Scene *scene, View *view, U32 x, U32 y, char ch) {
     Cursor *c = &view->cursor;
     PanelRow *row = &scene->panel_rows[c->panel_row];
     Panel *panel = &row->panels[c->panel];
-    U32 cx = row->x + c->vx + 2 - cam_x;
-    U32 cy = panel->y + c->y + 1 - cam_y;
+    U32 row_x = get_row_x(scene, row);
+    U32 panel_y = get_panel_y(row, panel);
+    U32 cx = row_x + c->vx + 2 - cam_x;
+    U32 cy = panel_y + c->y + 1 - cam_y;
     
     I64 ax = x - cam_x;
     I64 ay = y - cam_y;
@@ -31,26 +34,28 @@ void draw_char(Scene *scene, View *view, U32 x, U32 y, char ch) {
     }
 }
 
-void draw_panel(Scene *scene, View *view, PanelRow *pr, Panel *p) {
+void draw_panel(Scene *scene, View *view, PanelRow *row, Panel *p) {
+    U32 panel_y = get_panel_y(row, p);
+    U32 row_x = get_row_x(scene, row);
     for (U8 right = 0; right < 2; right++) {
         for (U8 bottom = 0; bottom < 2; bottom++) {
             draw_char(
                 scene, view,
-                pr->x + pr->w * right, p->y + p->h * bottom, '+'
+                row_x + row->w * right, panel_y + p->h * bottom, '+'
             );
             if (bottom == 0) {
                 for (U32 y = 1; y < p->h; y++) {
                     draw_char(
                         scene, view,
-                        pr->x + pr->w * right, p->y + y, '|'
+                        row_x + row->w * right, panel_y + y, '|'
                     );
                 }
             }
             if (right == 0) {
-                for (U32 x = 1; x < pr->w; x++) {
+                for (U32 x = 1; x < row->w; x++) {
                     draw_char(
                         scene, view,
-                        pr->x + x, p->y + p->h * bottom, '-'
+                        row_x + x, panel_y + p->h * bottom, '-'
                     );
                 }
             }
@@ -67,12 +72,14 @@ void draw_panel_rows(Scene *scene, View *view) {
     }
 }
 
-void draw_editor_content(Scene *scene, View *view, PanelRow *pr, Panel *p) {
+void draw_editor_content(Scene *scene, View *view, PanelRow *row, Panel *p) {
     EditorData data = p->data.editor;
+    U32 panel_y = get_panel_y(row, p);
+    U32 row_x = get_row_x(scene, row);
     for (U32 x = 0; x < strlen(data.path); x++) {
         draw_char(
             scene, view,
-            pr->x + x + 2, p->y - 1, data.path[x]
+            row_x + x + 2, panel_y - 1, data.path[x]
         );
     }
     for (U32 y = 0; y < data.h; y++) {
@@ -80,22 +87,22 @@ void draw_editor_content(Scene *scene, View *view, PanelRow *pr, Panel *p) {
             char ch = data.lines[y].content[x];
             draw_char(
                 scene, view,
-                pr->x + x + 2, p->y + y + 1,
+                row_x + x + 2, panel_y + y + 1,
                 ch == '\n' ? (config.newline_dot ? '.' : ' ') : ch
             );
         }
         if (config.fill_void) {
-            for (U32 x = data.lines[y].w; x < pr->w - 3; x++) {
-                draw_char(scene, view, pr->x + x + 2, p->y + y + 1, ':');
+            for (U32 x = data.lines[y].w; x < row->w - 3; x++) {
+                draw_char(scene, view, row_x + x + 2, panel_y + y + 1, ':');
             }
         }
     }
 }
 
-void draw_content(Scene *scene, View *view, PanelRow *pr, Panel *p) {
+void draw_content(Scene *scene, View *view, PanelRow *row, Panel *p) {
     switch (p->type) {
         case EDITOR_PANEL:
-            draw_editor_content(scene, view, pr, p);
+            draw_editor_content(scene, view, row, p);
             break;
         default:
             break;
@@ -120,8 +127,8 @@ void draw_scene(Scene *scene, View *view) {
         draw_panel_rows(scene, view);
         for (U16 x = 0; x < scene->panel_row_count; x++) {
             for (U16 y = 0; y < scene->panel_rows[x].panel_count; y++) {
-                PanelRow *pr = &scene->panel_rows[x];
-                draw_content(scene, view, pr, &pr->panels[y]);
+                PanelRow *row = &scene->panel_rows[x];
+                draw_content(scene, view, row, &row->panels[y]);
             }
         }
         draw_easteregg(scene, view);

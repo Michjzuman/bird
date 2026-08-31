@@ -28,12 +28,12 @@ typedef union {
 
 typedef struct {
     U8 type;
-    U32 y, h;
+    U32 h;
     PanelData data;
 } Panel;
 
 typedef struct {
-    U32 x, w;
+    U32 w;
     U16 panel_count;
     Panel *panels;
 } PanelRow;
