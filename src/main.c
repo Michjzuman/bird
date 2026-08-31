@@ -19,16 +19,19 @@ int main() {
         {
             Panel *panel = add_panel(row);
             load_editor_file(row, panel, "test.txt");
+            //add_panel_keybind(&scene, row, panel, '1');
         }
         {
             Panel *panel = add_panel(row);
             load_editor_file(row, panel, "include/panel.h");
+            //add_panel_keybind(&scene, row, panel, '2');
         }
     }
     {
         PanelRow *row = add_panel_row(&scene);
         Panel *panel = add_panel(row);
         load_editor_file(row, panel, "src/main.c");
+        //add_panel_keybind(&scene, row, panel, '3');
     }
 
     init_view(&view);

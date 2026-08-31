@@ -170,7 +170,7 @@ void update_editor_content(Scene *scene, View *view, int key) {
     if (changed) view->changed = true;
 }
 
-bool load_editor_file(PanelRow *panel_row, Panel *panel, char *path) {
+bool load_editor_file(PanelRow *row, Panel *panel, char *path) {
     EditorData data;
     data.path = path;
 
@@ -184,6 +184,9 @@ bool load_editor_file(PanelRow *panel_row, Panel *panel, char *path) {
     if (file == NULL) return false;
 
     U32 max_w = 0;
+    for (U16 y = 0; y < row->panel_count; y++) {
+        if (row->w > max_w + 2) max_w = row->w - 2;
+    }
     
     char line[2048];
     U32 y = 0;
@@ -214,7 +217,7 @@ bool load_editor_file(PanelRow *panel_row, Panel *panel, char *path) {
     fclose(file);
     panel->data.editor = data;
     panel->h = data.h + 1;
-    if (panel_row->w < max_w + 1) panel_row->w = max_w + 2;
+    if (row->w < max_w + 2) row->w = max_w + 2;
     return true;
 }
 
@@ -228,11 +231,14 @@ void close_editor_file(EditorData *data) {
 bool save_editor_file(EditorData *data) {
     FILE *file = fopen(data->path, "w");
     if (file == NULL) return false;
-
     for (U32 i = 0; i < data->h; i++) {
-        fprintf(file, "%s", data->lines[i].content);
+        EditorLine *line = &data->lines[i];
+        char *text = malloc((line->w + 2) * sizeof(char));
+        memcpy(text, line->content, (line->w + 1) * sizeof(char));
+        text[line->w + 1] = '\0';
+        fprintf(file, "%s", text);
+        free(text);
     }
-
     fclose(file);
     return true;
 }

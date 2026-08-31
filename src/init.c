@@ -27,6 +27,8 @@ void init_ncurses() {
 void init_scene(Scene *scene) {
     scene->panel_row_count = 0;
     scene->panel_rows = malloc(0);
+    scene->panel_keybind_count = 0;
+    scene->panel_keybinds = malloc(0);
 }
 
 void init_view(View *view) {

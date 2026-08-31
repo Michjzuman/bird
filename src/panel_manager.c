@@ -41,7 +41,9 @@ PanelRow *add_panel_row(Scene *scene) {
         x += scene->panel_rows[i].w + config.margin_x;
     }
     scene->panel_row_count++;
-    scene->panel_rows = realloc(scene->panel_rows, scene->panel_row_count * sizeof(PanelRow));
+    scene->panel_rows = realloc(
+        scene->panel_rows, scene->panel_row_count * sizeof(PanelRow)
+    );
     PanelRow *row = &scene->panel_rows[scene->panel_row_count - 1];
     init_panel_row(row);
     return row;
@@ -57,3 +59,15 @@ Panel *add_panel(PanelRow *row) {
     Panel *panel = &row->panels[row->panel_count - 1];
     return panel;
 }
+
+/*
+void add_panel_keybind(Scene *scene, PanelRow *row, Panel *panel, int key) {
+    scene->panel_keybinds = realloc(
+        scene->panel_keybinds, scene->panel_keybind_count + 1
+    );
+    PanelKeybind *bind = &scene->panel_keybinds[scene->panel_keybind_count];
+    bind->key = key;
+    bind->panel_row = row;
+    bind->panel = panel;
+    scene->panel_keybind_count++;
+}*/

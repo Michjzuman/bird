@@ -16,7 +16,7 @@ Bird will be a tui based code editor that will let you fly over your codebase.
 
 Build requirements:
 ```bash
-llvm clang ncurses git
+llvm clang ncurses git make
 ```
 Download and compile:
 ```bash

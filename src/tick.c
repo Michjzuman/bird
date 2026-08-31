@@ -1,5 +1,8 @@
 #include "scene.h"
 #include "editor.h"
+#include "panel_manager.h"
+
+#include "debug.h"
 
 #include <math.h>
 
@@ -61,6 +64,15 @@ void tick(Scene *scene, View *view) {
         if (key == 'a' || key == KEY_LEFT) {
             camera->speed_x--;
         }
+        /*
+        for (U8 i = 0; i < scene->panel_keybind_count; i++) {
+            PanelKeybind bind = scene->panel_keybinds[i];
+            if (key == bind.key) {
+                camera->x = get_row_x(scene, bind.panel_row);
+                camera->y = get_panel_y(bind.panel_row, bind.panel);
+            }
+        }
+        */
     }
     if (key == KEY_MOUSE) {
         MEVENT event;
