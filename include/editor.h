@@ -5,7 +5,8 @@
 
 void update_editor_content(Scene *, View *, int key);
 
-void load_editor_file(PanelRow *panel_row, Panel *panel, char *path);
+bool load_editor_file(PanelRow *panel_row, Panel *panel, char *path);
 void close_editor_file(EditorData *data);
+bool save_editor_file(EditorData *data);
 
 #endif

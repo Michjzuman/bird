@@ -103,7 +103,7 @@ void update_editor_content(Scene *scene, View *view, int key) {
             break;
         }
         case KEY_DOWN: {
-            if (c->y < panel->h - 2) {
+            if (c->y < content->h - 1) {
                 c->y++;
                 U32 w = content->lines[c->y].w - 1;
                 if (c->vx > w) c->vx = w;
@@ -170,7 +170,7 @@ void update_editor_content(Scene *scene, View *view, int key) {
     if (changed) view->changed = true;
 }
 
-void load_editor_file(PanelRow *panel_row, Panel *panel, char *path) {
+bool load_editor_file(PanelRow *panel_row, Panel *panel, char *path) {
     EditorData data;
     data.path = path;
 
@@ -181,13 +181,18 @@ void load_editor_file(PanelRow *panel_row, Panel *panel, char *path) {
     
     FILE *file = fopen(path, "r");
 
-    if (file == NULL) exit(1);
+    if (file == NULL) return false;
 
     U32 max_w = 0;
     
     char line[2048];
     U32 y = 0;
-    while (fgets(line, sizeof(line), file) != NULL) {
+    bool done = false;
+    char *check;
+    while ((check = fgets(line, sizeof(line), file)) != NULL || !done) {
+        bool empty_line = check == NULL;
+        bool last = empty_line || line[strlen(line) - 1] != '\n';
+        if (last) done = true;
         if (y >= data.capacity) {
             data.capacity *= 2;
             data.lines = realloc(
@@ -195,12 +200,13 @@ void load_editor_file(PanelRow *panel_row, Panel *panel, char *path) {
             );
         }
         EditorLine *nline = &data.lines[y];
-        nline->w = strlen(line);
+        nline->w = (empty_line ? 0 : strlen(line)) + last;
         if (max_w < nline->w) max_w = nline->w;
         nline->capacity = LINE_START_CAPACITY;
         while (nline->capacity < nline->w) nline->capacity *= 2;
         nline->content = malloc(nline->capacity * sizeof(char));
-        for (U32 i = 0; i < nline->w; i++) nline->content[i] = line[i];
+        for (U32 i = 0; i < nline->w - last; i++) nline->content[i] = line[i];
+        if (last) nline->content[nline->w - 1] = '\0';
         y++;
     }
     data.h = y;
@@ -209,6 +215,7 @@ void load_editor_file(PanelRow *panel_row, Panel *panel, char *path) {
     panel->data.editor = data;
     panel->h = data.h + 1;
     if (panel_row->w < max_w + 1) panel_row->w = max_w + 2;
+    return true;
 }
 
 void close_editor_file(EditorData *data) {
@@ -216,4 +223,16 @@ void close_editor_file(EditorData *data) {
         free(data->lines[y].content);
     }
     free(data->lines);
+}
+
+bool save_editor_file(EditorData *data) {
+    FILE *file = fopen(data->path, "w");
+    if (file == NULL) return false;
+
+    for (U32 i = 0; i < data->h; i++) {
+        fprintf(file, "%s", data->lines[i].content);
+    }
+
+    fclose(file);
+    return true;
 }

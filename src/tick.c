@@ -45,6 +45,7 @@ void tick(Scene *scene, View *view) {
         }
     } else {
         if (key == 'q') {
+            save_editor_file(&scene->panel_rows[view->cursor.panel_row].panels[view->cursor.panel].data.editor);
             endwin();
             exit(0);
         }
@@ -94,10 +95,7 @@ void tick(Scene *scene, View *view) {
     if (0.1 < fabs(camera->speed_x)) camera->x += camera->speed_x;
     if (0.1 < fabs(camera->speed_y)) camera->y += camera->speed_y;
 
-    if (
-        camera->x != old_camera.x ||
-        camera->y != old_camera.y
-    ) {
+    if (camera->x != old_camera.x || camera->y != old_camera.y) {
         view->changed = true;
     }
 }

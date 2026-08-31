@@ -88,7 +88,8 @@ void draw_editor_content(Scene *scene, View *view, PanelRow *row, Panel *p) {
             draw_char(
                 scene, view,
                 row_x + x + 2, panel_y + y + 1,
-                ch == '\n' ? (config.newline_dot ? '.' : ' ') : ch
+                ch == '\n' ? (config.newline_dot ? '.' : ' ') :
+                (ch == '\0' ? ' ' : ch)
             );
         }
         if (config.fill_void) {
