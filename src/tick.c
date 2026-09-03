@@ -1,8 +1,5 @@
 #include "scene.h"
 #include "editor.h"
-#include "panel_manager.h"
-
-#include "debug.h"
 
 #include <math.h>
 
@@ -47,32 +44,37 @@ void tick(Scene *scene, View *view) {
             update_content(scene, view, key);
         }
     } else {
-        if (key == 'q') {
-            save_editor_file(&scene->panel_rows[view->cursor.panel_row].panels[view->cursor.panel].data.editor);
-            endwin();
-            exit(0);
+        switch (key) {
+            case 'q':
+                save_editor_file(
+                    &scene->panel_rows[
+                        view->cursor.panel_row
+                    ].panels[
+                        view->cursor.panel
+                    ].data.editor
+                );
+                endwin(); exit(0); break;
+            case 'w': case KEY_UP:
+                camera->speed_y--; break;
+            case 'd': case KEY_RIGHT:
+                camera->speed_x++; break;
+            case 's': case KEY_DOWN:
+                camera->speed_y++; break;
+            case 'a': case KEY_LEFT:
+                camera->speed_x--; break;
         }
-        if (key == 'w' || key == KEY_UP) {
-            camera->speed_y--;
-        }
-        if (key == 'd' || key == KEY_RIGHT) {
-            camera->speed_x++;
-        }
-        if (key == 's' || key == KEY_DOWN) {
-            camera->speed_y++;
-        }
-        if (key == 'a' || key == KEY_LEFT) {
-            camera->speed_x--;
-        }
-        /*
-        for (U8 i = 0; i < scene->panel_keybind_count; i++) {
-            PanelKeybind bind = scene->panel_keybinds[i];
-            if (key == bind.key) {
-                camera->x = get_row_x(scene, bind.panel_row);
-                camera->y = get_panel_y(bind.panel_row, bind.panel);
+        ///* this is the first part of bird ever written in bird:
+        for (U16 x = 0; x < scene->panel_row_count; x++) {
+            PanelRow *row = &scene->panel_rows[x];
+            for (U16 y = 0; y < row->panel_count; y++) {
+                Panel *panel = &row->panels[y];
+                if (key == panel->keybind) {
+                    camera->x = get_row_x(scene, x);
+                    camera->y = get_panel_y(scene, x, y);
+                }
             }
-        }
-        */
+        } 
+        //*/
     }
     if (key == KEY_MOUSE) {
         MEVENT event;

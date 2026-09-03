@@ -31,4 +31,6 @@ typedef struct {
     bool locked_in;
 } View;
 
+void init_view(View *view);
+
 #endif

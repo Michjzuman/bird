@@ -1,26 +1,28 @@
 #include "scene.h"
 #include "config.h"
 
-U32 get_row_x(Scene *scene, PanelRow *row) {
-    U32 result = 0;
-    for (U16 i = 0; i < scene->panel_row_count; i++) {
-        if (row == &scene->panel_rows[i]) {
-            return result;
-        }
-        result += scene->panel_rows[i].w + config.margin_x;
-    }
-    return 0;
+void init_scene(Scene *scene) {
+    scene->panel_row_count = 0;
+    scene->panel_rows = malloc(0);
 }
 
-U32 get_panel_y(PanelRow *row, Panel *panel) {
+U32 get_row_x(Scene *scene, U16 x) {
+    U32 result = 0;
+    for (U16 i = 0; i < scene->panel_row_count; i++) {
+        if (i >= x) break;
+        result += scene->panel_rows[i].w + config.margin_x;
+    }
+    return result;
+}
+
+U32 get_panel_y(Scene *scene, U16 x, U16 y) {
+    PanelRow *row = &scene->panel_rows[x];
     U32 result = 1;
     for (U16 i = 0; i < row->panel_count; i++) {
-        if (panel == &row->panels[i]) {
-            return result;
-        }
+        if (i >= y) break;
         result += row->panels[i].h + config.margin_y;
     }
-    return 0;
+    return result;
 }
 
 static void init_panel_row(PanelRow *row) {
@@ -35,7 +37,7 @@ void close_scene(Scene *scene) {
     free(scene->panel_rows);
 }
 
-PanelRow *add_panel_row(Scene *scene) {
+void add_panel_row(Scene *scene) {
     U16 x = 0;
     for (U16 i = 0; i < scene->panel_row_count; i++) {
         x += scene->panel_rows[i].w + config.margin_x;
@@ -46,10 +48,14 @@ PanelRow *add_panel_row(Scene *scene) {
     );
     PanelRow *row = &scene->panel_rows[scene->panel_row_count - 1];
     init_panel_row(row);
-    return row;
 }
 
-Panel *add_panel(PanelRow *row) {
+void add_panel(Scene *scene, U16 x) {
+    static int keybinds[] = {
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '\''
+    };
+    static U8 next_keybind = 0;
+    PanelRow *row = &scene->panel_rows[x];
     U16 y = 1;
     for (U16 i = 0; i < row->panel_count; i++) {
         y += row->panels[i].h + config.margin_y;
@@ -57,17 +63,6 @@ Panel *add_panel(PanelRow *row) {
     row->panel_count++;
     row->panels = realloc(row->panels, row->panel_count * sizeof(Panel));
     Panel *panel = &row->panels[row->panel_count - 1];
-    return panel;
+    panel->keybind = keybinds[next_keybind];
+    next_keybind++;
 }
-
-/*
-void add_panel_keybind(Scene *scene, PanelRow *row, Panel *panel, int key) {
-    scene->panel_keybinds = realloc(
-        scene->panel_keybinds, scene->panel_keybind_count + 1
-    );
-    PanelKeybind *bind = &scene->panel_keybinds[scene->panel_keybind_count];
-    bind->key = key;
-    bind->panel_row = row;
-    bind->panel = panel;
-    scene->panel_keybind_count++;
-}*/

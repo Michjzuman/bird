@@ -170,7 +170,9 @@ void update_editor_content(Scene *scene, View *view, int key) {
     if (changed) view->changed = true;
 }
 
-bool load_editor_file(PanelRow *row, Panel *panel, char *path) {
+bool load_editor_file(Scene *scene, U16 x, U16 y, char *path) {
+    PanelRow *row = &scene->panel_rows[x];
+    Panel *panel = &row->panels[y];
     EditorData data;
     data.path = path;
 
@@ -180,29 +182,28 @@ bool load_editor_file(PanelRow *row, Panel *panel, char *path) {
     data.lines = malloc(data.capacity * sizeof(EditorLine));
     
     FILE *file = fopen(path, "r");
-
     if (file == NULL) return false;
 
     U32 max_w = 0;
-    for (U16 y = 0; y < row->panel_count; y++) {
+    for (U16 i = 0; i < row->panel_count; i++) {
         if (row->w > max_w + 2) max_w = row->w - 2;
     }
     
     char line[2048];
-    U32 y = 0;
+    U32 h = 0;
     bool done = false;
     char *check;
     while ((check = fgets(line, sizeof(line), file)) != NULL || !done) {
         bool empty_line = check == NULL;
         bool last = empty_line || line[strlen(line) - 1] != '\n';
         if (last) done = true;
-        if (y >= data.capacity) {
+        if (h >= data.capacity) {
             data.capacity *= 2;
             data.lines = realloc(
                 data.lines, data.capacity * sizeof(EditorLine)
             );
         }
-        EditorLine *nline = &data.lines[y];
+        EditorLine *nline = &data.lines[h];
         nline->w = (empty_line ? 0 : strlen(line)) + last;
         if (max_w < nline->w) max_w = nline->w;
         nline->capacity = LINE_START_CAPACITY;
@@ -210,9 +211,9 @@ bool load_editor_file(PanelRow *row, Panel *panel, char *path) {
         nline->content = malloc(nline->capacity * sizeof(char));
         for (U32 i = 0; i < nline->w - last; i++) nline->content[i] = line[i];
         if (last) nline->content[nline->w - 1] = '\0';
-        y++;
+        h++;
     }
-    data.h = y;
+    data.h = h;
     
     fclose(file);
     panel->data.editor = data;
@@ -233,9 +234,9 @@ bool save_editor_file(EditorData *data) {
     if (file == NULL) return false;
     for (U32 i = 0; i < data->h; i++) {
         EditorLine *line = &data->lines[i];
-        char *text = malloc((line->w + 2) * sizeof(char));
-        memcpy(text, line->content, (line->w + 1) * sizeof(char));
-        text[line->w + 1] = '\0';
+        char *text = malloc((line->w + 1) * sizeof(char));
+        memcpy(text, line->content, line->w * sizeof(char));
+        text[line->w] = '\0';
         fprintf(file, "%s", text);
         free(text);
     }

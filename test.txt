@@ -1,11 +1,5 @@
-Hello World
+#include <stdio.h>
 
-
-
-123
-q
-abc
-
-
-
-print("Hello
+int main(int argc, char **argv) {
+    printf("Hello World\n");
+}

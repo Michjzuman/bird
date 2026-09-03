@@ -1,6 +1,5 @@
 #include "scene.h"
 #include "config.h"
-#include "panel_manager.h"
 
 #include <string.h>
 
@@ -11,8 +10,8 @@ void draw_char(Scene *scene, View *view, U32 x, U32 y, char ch) {
     Cursor *c = &view->cursor;
     PanelRow *row = &scene->panel_rows[c->panel_row];
     Panel *panel = &row->panels[c->panel];
-    U32 row_x = get_row_x(scene, row);
-    U32 panel_y = get_panel_y(row, panel);
+    U32 row_x = get_row_x(scene, c->panel_row);
+    U32 panel_y = get_panel_y(scene, c->panel_row, c->panel);
     U32 cx = row_x + c->vx + 2 - cam_x;
     U32 cy = panel_y + c->y + 1 - cam_y;
     
@@ -34,9 +33,11 @@ void draw_char(Scene *scene, View *view, U32 x, U32 y, char ch) {
     }
 }
 
-void draw_panel(Scene *scene, View *view, PanelRow *row, Panel *p) {
-    U32 panel_y = get_panel_y(row, p);
-    U32 row_x = get_row_x(scene, row);
+void draw_panel(Scene *scene, View *view, U16 x, U16 y) {
+    PanelRow *row = &scene->panel_rows[x];
+    Panel *p = &row->panels[y];
+    U32 panel_y = get_panel_y(scene, x, y);
+    U32 row_x = get_row_x(scene, x);
     for (U8 right = 0; right < 2; right++) {
         for (U8 bottom = 0; bottom < 2; bottom++) {
             draw_char(
@@ -67,15 +68,17 @@ void draw_panel_rows(Scene *scene, View *view) {
     for (U16 x = 0; x < scene->panel_row_count; x++) {
         PanelRow *row = &scene->panel_rows[x];
         for (U16 y = 0; y < row->panel_count; y++) {
-            draw_panel(scene, view, row, &row->panels[y]);
+            draw_panel(scene, view, x, y);
         }
     }
 }
 
-void draw_editor_content(Scene *scene, View *view, PanelRow *row, Panel *p) {
+void draw_editor_content(Scene *scene, View *view, U16 x, U16 y) {
+    PanelRow *row = &scene->panel_rows[x];
+    Panel *p = &row->panels[y];
     EditorData data = p->data.editor;
-    U32 panel_y = get_panel_y(row, p);
-    U32 row_x = get_row_x(scene, row);
+    U32 panel_y = get_panel_y(scene, x, y);
+    U32 row_x = get_row_x(scene, x);
     for (U32 x = 0; x < strlen(data.path); x++) {
         draw_char(
             scene, view,
@@ -100,10 +103,10 @@ void draw_editor_content(Scene *scene, View *view, PanelRow *row, Panel *p) {
     }
 }
 
-void draw_content(Scene *scene, View *view, PanelRow *row, Panel *p) {
-    switch (p->type) {
+void draw_content(Scene *scene, View *view, U16 x, U16 y) {
+    switch (scene->panel_rows[x].panels[y].type) {
         case EDITOR_PANEL:
-            draw_editor_content(scene, view, row, p);
+            draw_editor_content(scene, view, x, y);
             break;
         default:
             break;
@@ -129,7 +132,7 @@ void draw_scene(Scene *scene, View *view) {
         for (U16 x = 0; x < scene->panel_row_count; x++) {
             for (U16 y = 0; y < scene->panel_rows[x].panel_count; y++) {
                 PanelRow *row = &scene->panel_rows[x];
-                draw_content(scene, view, row, &row->panels[y]);
+                draw_content(scene, view, x, y);
             }
         }
         draw_easteregg(scene, view);
