@@ -137,9 +137,9 @@ void update_editor_content(Scene *scene, View *view, int key) {
                 U32 cx = content->lines[c->y - 1].w - 1;
                 wrap_editor_line(panel, c->y, 0, c->y - 1, false);
                 delete_editor_line(panel, c->y);
-                U32 w = content->lines[c->y - 1].w;
-                if (w > row->w) row->w = w + 2;
                 c->y--; c->x = cx;
+                U32 w = content->lines[c->y].w;
+                if (w + 2 > row->w) row->w = w + 2;
                 break;
             } else break;;
         }
@@ -232,10 +232,12 @@ void close_editor_file(EditorData *data) {
 bool save_editor_file(EditorData *data) {
     FILE *file = fopen(data->path, "w");
     if (file == NULL) return false;
-    for (U32 i = 0; i < data->h; i++) {
-        EditorLine *line = &data->lines[i];
+    for (U32 y = 0; y < data->h; y++) {
+        EditorLine *line = &data->lines[y];
         char *text = malloc((line->w + 1) * sizeof(char));
-        memcpy(text, line->content, line->w * sizeof(char));
+        for (U32 x = 0; x < line->w; x++) {
+            text[x] = line->content[x];
+        }
         text[line->w] = '\0';
         fprintf(file, "%s", text);
         free(text);
